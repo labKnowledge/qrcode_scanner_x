@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Box, Button, Typography, Paper, CircularProgress } from '@mui/material';
-import { Upload as UploadIcon, OpenInNew as OpenInNewIcon, Share as ShareIcon } from '@mui/icons-material';
+import { Box, Button, Typography, Paper, CircularProgress, Fade, Zoom } from '@mui/material';
+import { Upload as UploadIcon, OpenInNew as OpenInNewIcon, Share as ShareIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 
 interface QRCode {
@@ -185,7 +185,7 @@ const QRCodeProcessor = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', p: 2 }}>
+    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
       <input
         type="file"
         accept="image/*"
@@ -194,61 +194,143 @@ const QRCodeProcessor = () => {
         style={{ display: 'none' }}
       />
       
-      <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          p: 4,
+          textAlign: 'center',
+          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+          border: '1px solid',
+          borderColor: 'divider',
+          transition: 'all 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 16px -4px rgb(0 0 0 / 0.1), 0 4px 8px -4px rgb(0 0 0 / 0.1)',
+          }
+        }}
+      >
         {!decodedContent && !isProcessing && (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<UploadIcon />}
-            onClick={handleUploadClick}
-            size="large"
-          >
-            Upload QR Code Image
-          </Button>
+          <Fade in={true}>
+            <Box>
+              <Typography variant="h5" gutterBottom sx={{ mb: 3, fontWeight: 600 }}>
+                Scan Your QR Code
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: '500px', mx: 'auto' }}>
+                Upload a clear image of your QR code to instantly decode its contents. We support all standard QR code formats.
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<UploadIcon />}
+                onClick={handleUploadClick}
+                size="large"
+                sx={{
+                  py: 1.5,
+                  px: 4,
+                  fontSize: '1.1rem',
+                  background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
+                  }
+                }}
+              >
+                Upload QR Code Image
+              </Button>
+            </Box>
+          </Fade>
         )}
 
         {isProcessing && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <CircularProgress />
-            <Typography>Processing QR Code...</Typography>
-          </Box>
+          <Fade in={true}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, py: 4 }}>
+              <CircularProgress size={60} thickness={4} />
+              <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                Processing QR Code...
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                This may take a few moments
+              </Typography>
+            </Box>
+          </Fade>
         )}
 
         {decodedContent && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Decoded Content:
-            </Typography>
-            <Typography variant="body1" sx={{ wordBreak: 'break-all', mb: 2 }}>
-              {decodedContent}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
-              {isValidUrl(decodedContent) && (
+          <Zoom in={true}>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                Decoded Content
+              </Typography>
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  p: 3, 
+                  mb: 4, 
+                  backgroundColor: 'rgba(37, 99, 235, 0.04)',
+                  borderColor: 'primary.light',
+                  borderRadius: 2
+                }}
+              >
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    wordBreak: 'break-all',
+                    fontFamily: 'monospace',
+                    fontSize: '1.1rem',
+                    lineHeight: 1.6
+                  }}
+                >
+                  {decodedContent}
+                </Typography>
+              </Paper>
+              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                {isValidUrl(decodedContent) && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<OpenInNewIcon />}
+                    onClick={handleOpenUrl}
+                    sx={{
+                      background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
+                      '&:hover': {
+                        background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
+                      }
+                    }}
+                  >
+                    Open URL
+                  </Button>
+                )}
                 <Button
                   variant="contained"
-                  color="primary"
-                  startIcon={<OpenInNewIcon />}
-                  onClick={handleOpenUrl}
+                  color="secondary"
+                  startIcon={<ShareIcon />}
+                  onClick={handleShare}
+                  sx={{
+                    background: 'linear-gradient(45deg, #7c3aed, #2563eb)',
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #5b21b6, #1e40af)',
+                    }
+                  }}
                 >
-                  Open URL
+                  Share
                 </Button>
-              )}
-              <Button
-                variant="contained"
-                color="secondary"
-                startIcon={<ShareIcon />}
-                onClick={handleShare}
-              >
-                Share
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={resetProcessor}
-              >
-                Upload Another
-              </Button>
+                <Button
+                  variant="outlined"
+                  onClick={resetProcessor}
+                  startIcon={<RefreshIcon />}
+                  sx={{
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
+                    '&:hover': {
+                      borderColor: 'primary.dark',
+                      backgroundColor: 'rgba(37, 99, 235, 0.04)',
+                    }
+                  }}
+                >
+                  Scan Another
+                </Button>
+              </Box>
             </Box>
-          </Box>
+          </Zoom>
         )}
       </Paper>
     </Box>
