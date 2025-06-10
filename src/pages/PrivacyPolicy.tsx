@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Typography, Box, Paper, List, ListItem, ListItemText } from '@mui/material';
 
-const PrivacyPolicy = () => {
+const PrivacyPolicy: React.FC = () => {
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper elevation={0} sx={{ p: { xs: 3, md: 6 }, borderRadius: 2 }}>
