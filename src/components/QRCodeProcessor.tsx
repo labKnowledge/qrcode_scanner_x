@@ -1,13 +1,35 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Box, Button, Typography, Paper, CircularProgress } from '@mui/material';
 import { Upload as UploadIcon, OpenInNew as OpenInNewIcon, Share as ShareIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import jsQR from 'jsqr';
+
+interface QRCode {
+  data: string;
+  location: {
+    topRightCorner: { x: number; y: number };
+    topLeftCorner: { x: number; y: number };
+    bottomRightCorner: { x: number; y: number };
+    bottomLeftCorner: { x: number; y: number };
+  };
+}
+
+declare global {
+  interface Window {
+    jsQR: (
+      imageData: Uint8ClampedArray,
+      width: number,
+      height: number,
+      options?: {
+        inversionAttempts?: 'dontInvert' | 'onlyInvert' | 'attemptBoth' | 'invertFirst';
+      }
+    ) => QRCode | null;
+  }
+}
 
 const QRCodeProcessor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [decodedContent, setDecodedContent] = useState<string | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processQRCode = useCallback(async (file: File) => {
     try {
@@ -68,22 +90,9 @@ const QRCodeProcessor = () => {
             dataLength: imageData.data.length
           });
 
-          // Try different processing options
-          const options = [
-            { inversionAttempts: 'dontInvert' as const },
-            { inversionAttempts: 'onlyInvert' as const },
-            { inversionAttempts: 'attemptBoth' as const },
-            { inversionAttempts: 'invertFirst' as const }
-          ];
-
-          let code = null;
-          for (const option of options) {
-            code = jsQR(imageData.data, width, height, option);
-            if (code) {
-              console.log('QR code found with options:', option);
-              break;
-            }
-          }
+          const code = window.jsQR(imageData.data, width, height, {
+            inversionAttempts: "dontInvert",
+          });
 
           if (code) {
             console.log('Decoded QR code:', code);
