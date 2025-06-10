@@ -26,8 +26,8 @@ RUN npm install -g serve
 # Copy built assets from build stage
 COPY --from=build /app/dist ./build
 
-# Expose port 3000
-EXPOSE 3000
+# Expose port 3005
+EXPOSE 3005
 
 # Start the application
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["serve", "-s", "build", "-l", "3005"]
