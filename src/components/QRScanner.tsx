@@ -56,7 +56,7 @@ const QRScanner = () => {
           title: 'Scanned QR Code',
           text: scannedResult,
         });
-      } catch (error) {
+      } catch {
         toast.error('Sharing not supported or failed');
       }
     }
@@ -72,7 +72,7 @@ const QRScanner = () => {
     try {
       new URL(string);
       return true;
-    } catch (_) {
+    } catch {
       return false;
     }
   };

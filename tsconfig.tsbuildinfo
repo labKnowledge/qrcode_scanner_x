@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/QRCodeProcessor.tsx","./src/components/QRScanner.tsx","./src/types/jsqr.d.ts"],"version":"5.8.3"}
