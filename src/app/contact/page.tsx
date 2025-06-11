@@ -162,7 +162,7 @@ const Contact = () => {
                     Email
                   </Typography>
                   <Typography variant="body1">
-                    support@qrpro.com
+                    support@scancode.pro
                   </Typography>
                 </Box>
               </Box>

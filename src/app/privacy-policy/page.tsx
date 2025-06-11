@@ -25,7 +25,7 @@ const PrivacyPolicy: React.FC = () => {
             Introduction
           </Typography>
           <Typography variant="body1" paragraph>
-            At QR Pro, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our QR code processing service.
+            At ScanPro, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our QR code processing service.
           </Typography>
         </Box>
 
@@ -118,7 +118,7 @@ const PrivacyPolicy: React.FC = () => {
             If you have any questions about this Privacy Policy, please contact us at:
           </Typography>
           <Typography variant="body1" sx={{ color: 'primary.main' }}>
-            privacy@qrpro.com
+            privacy@scancode.pro
           </Typography>
         </Box>
       </Paper>

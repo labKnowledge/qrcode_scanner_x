@@ -1,6 +1,18 @@
-import { ProcessingLog, IProcessingLog } from '../models/ProcessingLog';
-import { connectDB, getConnection } from '../utils/database';
+import { ProcessingLogs } from '../models/ProcessingLog';
+import { connectToDatabase, getConnection } from '../utils/database';
 import mongoose from 'mongoose';
+
+// Define the interface locally since it's not exported from the model
+export interface IProcessingLog extends mongoose.Document {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  processingTime: number;
+  success: boolean;
+  errorMessage?: string;
+  qrCodeContent?: string;
+  timestamp: Date;
+}
 
 export interface ProcessingLogInput {
   userId?: string;
@@ -16,7 +28,7 @@ export interface ProcessingLogInput {
 export class ProcessingLogService {
   private static async ensureConnection() {
     try {
-      const connection = await connectDB();
+      const connection = await connectToDatabase();
       return connection;
     } catch (error) {
       console.error('Database connection error:', error);
@@ -53,7 +65,7 @@ export class ProcessingLogService {
   static async createLog(logData: ProcessingLogInput): Promise<IProcessingLog> {
     try {
       await this.ensureConnection();
-      const log = new ProcessingLog(logData);
+      const log = new ProcessingLogs(logData);
       return await log.save();
     } catch (error) {
       console.error('Error creating processing log:', error);
@@ -65,7 +77,7 @@ export class ProcessingLogService {
   static async getLogsByUserId(userId: string, limit: number = 10, skip: number = 0): Promise<IProcessingLog[]> {
     try {
       await this.ensureConnection();
-      return await ProcessingLog.find({ userId })
+      return await ProcessingLogs.find({ userId })
         .sort({ timestamp: -1 })
         .skip(skip)
         .limit(limit);
@@ -78,7 +90,7 @@ export class ProcessingLogService {
   static async getRecentLogs(limit: number = 10): Promise<IProcessingLog[]> {
     try {
       await this.ensureConnection();
-      return await ProcessingLog.find()
+      return await ProcessingLogs.find()
         .sort({ timestamp: -1 })
         .limit(limit);
     } catch (error) {
@@ -95,9 +107,9 @@ export class ProcessingLogService {
     try {
       await this.ensureConnection();
       const [totalProcessed, successfulProcessed, avgProcessingTime] = await Promise.all([
-        ProcessingLog.countDocuments(),
-        ProcessingLog.countDocuments({ success: true }),
-        ProcessingLog.aggregate([
+        ProcessingLogs.countDocuments(),
+        ProcessingLogs.countDocuments({ success: true }),
+        ProcessingLogs.aggregate([
           {
             $group: {
               _id: null,

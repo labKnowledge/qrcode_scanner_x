@@ -25,7 +25,7 @@ const TermsOfService: React.FC = () => {
             Agreement to Terms
           </Typography>
           <Typography variant="body1" paragraph>
-            By accessing and using QR Pro's services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing our services.
+            By accessing and using ScanPro&apos;s services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing our services.
           </Typography>
         </Box>
 
@@ -34,7 +34,7 @@ const TermsOfService: React.FC = () => {
             Use License
           </Typography>
           <Typography variant="body1" paragraph>
-            Permission is granted to temporarily use QR Pro's services for personal, non-commercial purposes. This is the grant of a license, not a transfer of title, and under this license you may not:
+            Permission is granted to temporarily use ScanPro&apos;s services for personal, non-commercial purposes. This is the grant of a license, not a transfer of title, and under this license you may not:
           </Typography>
           <List>
             <ListItem sx={{ display: 'list-item', pl: 0 }}>
@@ -86,7 +86,7 @@ const TermsOfService: React.FC = () => {
             Disclaimer
           </Typography>
           <Typography variant="body1" paragraph>
-            The materials on QR Pro's service are provided on an 'as is' basis. QR Pro makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+            The materials on ScanPro&apos;s service are provided on an &apos;as is&apos; basis. ScanPro makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
           </Typography>
         </Box>
 
@@ -95,7 +95,7 @@ const TermsOfService: React.FC = () => {
             Limitations
           </Typography>
           <Typography variant="body1" paragraph>
-            In no event shall QR Pro or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on QR Pro's service.
+            In no event shall ScanPro or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on ScanPro&apos;s service.
           </Typography>
         </Box>
 
@@ -104,7 +104,7 @@ const TermsOfService: React.FC = () => {
             Revisions and Errata
           </Typography>
           <Typography variant="body1" paragraph>
-            The materials appearing on QR Pro's service could include technical, typographical, or photographic errors. QR Pro does not warrant that any of the materials on its service are accurate, complete, or current. QR Pro may make changes to the materials contained on its service at any time without notice.
+            The materials appearing on ScanPro&apos;s service could include technical, typographical, or photographic errors. ScanPro does not warrant that any of the materials on its service are accurate, complete, or current. ScanPro may make changes to the materials contained on its service at any time without notice.
           </Typography>
         </Box>
 
@@ -116,7 +116,7 @@ const TermsOfService: React.FC = () => {
             If you have any questions about these Terms of Service, please contact us at:
           </Typography>
           <Typography variant="body1" sx={{ color: 'primary.main' }}>
-            legal@qrpro.com
+            legal@scancode.pro
           </Typography>
         </Box>
       </Paper>
