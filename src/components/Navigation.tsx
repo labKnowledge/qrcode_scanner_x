@@ -3,6 +3,7 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, Container, Link as MuiLink } from '@mui/material';
 import Link from 'next/link';
 import { ToastContainer } from 'react-toastify';
+import ScanCounter from './ScanCounter';
 
 const Navigation: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -32,22 +33,35 @@ const Navigation: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       <Box component="footer" sx={{ py: 6, borderTop: '1px solid', borderColor: 'divider' }}>
         <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Scan Counter Section */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            mb: 4,
+            p: 2,
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <ScanCounter />
+          </Box>
+
+          {/* Footer Links Section */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
             <Typography variant="body2" color="text.secondary">
               © 2024 ScanPro. All rights reserved.
             </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Link href="/privacy-policy" style={{ textDecoration: 'none' }}>
-                <MuiLink color="inherit" underline="hover" sx={{ cursor: 'pointer' }}>Privacy</MuiLink>
-              </Link>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               
-              <Link href="/terms-of-service" style={{ textDecoration: 'none' }}>
-                <MuiLink color="inherit" underline="hover" sx={{ cursor: 'pointer' }}>Terms</MuiLink>
-              </Link>
+                <MuiLink color="inherit" href="/privacy-policy" style={{ textDecoration: 'none' }} underline="hover" sx={{ cursor: 'pointer' }}>Privacy</MuiLink>
               
-              <Link href="/contact" style={{ textDecoration: 'none' }}>
-                <MuiLink color="inherit" underline="hover" sx={{ cursor: 'pointer' }}>Contact</MuiLink>
-              </Link>
+              
+                <MuiLink color="inherit" href="/terms-of-service" style={{ textDecoration: 'none' }} underline="hover" sx={{ cursor: 'pointer' }}>Terms</MuiLink>
+              
+              
+                <MuiLink color="inherit" href="/contact" style={{ textDecoration: 'none' }} underline="hover" sx={{ cursor: 'pointer' }}>Contact</MuiLink>
+              
             </Box>
           </Box>
         </Container>
