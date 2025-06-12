@@ -1,5 +1,11 @@
 import React from 'react';
 import { Container, Typography, Box, Paper, List, ListItem, ListItemText } from '@mui/material';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy - ScanPro',
+  description: 'Privacy Policy for ScanPro QR code processing service. Learn how we collect, use, and protect your information.',
+};
 
 const PrivacyPolicy: React.FC = () => {
   return (

@@ -1,5 +1,11 @@
 import React from 'react';
 import { Container, Typography, Box, Paper, List, ListItem, ListItemText } from '@mui/material';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service - ScanPro',
+  description: 'Terms of Service for ScanPro QR code processing service. Learn about our service usage terms and conditions.',
+};
 
 const TermsOfService: React.FC = () => {
   return (
