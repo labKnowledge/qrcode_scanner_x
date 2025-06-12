@@ -77,96 +77,47 @@ const QRCodeProcessor: React.FC = () => {
   };
 
   const processImage = async (file: File): Promise<ProcessingResult> => {
-    const startTime = performance.now();
     let processingResult: ProcessingResult = {
       success: false,
       error: 'Processing failed'
     };
 
     try {
-      const jsQR = (await import('jsqr')).default;
-      const image = new Image();
-      const imageUrl = URL.createObjectURL(file);
-      
-      // Add timeout protection
-      const timeoutId = setTimeout(() => {
-        URL.revokeObjectURL(imageUrl);
-        if (processingResult.success === false && processingResult.error === 'Processing failed') {
-          processingResult = {
-            success: false,
-            error: 'Processing timed out. Please try a smaller image or different format.'
-          };
-          toast.error('Processing timed out. Please try a smaller image or different format.');
-        }
-      }, 10000);
+      // Create FormData to send the image to the server
+      const formData = new FormData();
+      formData.append('image', file);
 
-      await new Promise<void>((resolve, reject) => {
-        image.onload = () => {
-          clearTimeout(timeoutId);
-          resolve();
-        };
-        image.onerror = () => {
-          clearTimeout(timeoutId);
-          reject(new Error('Failed to load image'));
-        };
-        image.src = imageUrl;
+      // Send to secure server-side API
+      const response = await fetch('/api/process-qr', {
+        method: 'POST',
+        body: formData,
       });
 
-      const canvas = document.createElement('canvas');
-      // Use optimized context for frequent reads
-      const context = canvas.getContext('2d', { willReadFrequently: true });
-      if (!context) {
-        throw new Error('Could not get canvas context');
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please try again later.');
+        } else if (response.status === 400) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Invalid request');
+        } else {
+          throw new Error('Server error. Please try again.');
+        }
       }
 
-      // Calculate optimal size for QR code detection
-      // QR codes work best when the finder patterns are about 10-15 pixels wide
-      const MIN_FINDER_PATTERN_SIZE = 10;
-      const MAX_FINDER_PATTERN_SIZE = 15;
-      
-      // Estimate QR code size (assuming it takes up about 1/3 of the image)
-      const estimatedQRSize = Math.min(image.width, image.height) / 3;
-      const scale = Math.min(
-        MAX_FINDER_PATTERN_SIZE / (estimatedQRSize / 7), // 7 is the number of modules in a finder pattern
-        Math.max(1, MIN_FINDER_PATTERN_SIZE / (estimatedQRSize / 7))
-      );
+      const result = await response.json();
 
-      const width = Math.floor(image.width * scale);
-      const height = Math.floor(image.height * scale);
-
-      canvas.width = width;
-      canvas.height = height;
-
-      // Preprocessing: Draw image with white background for better contrast
-      context.fillStyle = 'white';
-      context.fillRect(0, 0, width, height);
-      
-      // Use high-quality image scaling for better QR detection
-      context.imageSmoothingEnabled = true;
-      context.imageSmoothingQuality = 'high';
-      context.drawImage(image, 0, 0, width, height);
-      
-      const imageData = context.getImageData(0, 0, width, height);
-      
-      // Enhanced jsQR options for better detection
-      const code = jsQR(imageData.data, imageData.width, imageData.height, {
-        inversionAttempts: "dontInvert"
-      });
-
-      URL.revokeObjectURL(imageUrl);
-
-      if (code) {
+      if (result.success) {
         processingResult = {
           success: true,
-          content: code.data
+          content: result.content
         };
         toast.success('QR code processed successfully!');
       } else {
         processingResult = {
           success: false,
-          error: 'No QR code found in the image'
+          error: result.error || 'No QR code found in the image'
         };
-        toast.error('No QR code found in the image');
+        toast.error(processingResult.error);
       }
     } catch (err) {
       processingResult = {
@@ -174,34 +125,6 @@ const QRCodeProcessor: React.FC = () => {
         error: err instanceof Error ? err.message : 'Failed to process image'
       };
       toast.error(processingResult.error);
-    } finally {
-      const processingTime = performance.now() - startTime;
-      
-      // Attempt to log the processing attempt, but don't let it affect the user experience
-      try {
-        const response = await fetch('/api/log', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fileName: file.name,
-            fileSize: file.size,
-            fileType: file.type,
-            processingTime,
-            success: processingResult.success,
-            errorMessage: processingResult.error,
-            qrCodeContent: processingResult.content
-          }),
-        });
-
-        if (!response.ok) {
-          console.warn('Failed to log processing attempt:', await response.text());
-        }
-      } catch (err) {
-        // Silently handle logging errors - they shouldn't affect the user experience
-        console.warn('Failed to log processing attempt:', err);
-      }
     }
 
     return processingResult;
