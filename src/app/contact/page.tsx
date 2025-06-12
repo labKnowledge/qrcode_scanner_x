@@ -111,16 +111,33 @@ const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSnackbar({
-        open: true,
-        message: 'Thank you for your message. We will get back to you soon!',
-        severity: 'success'
+      // Send form data to webhook
+      const response = await fetch('https://model.takenolab.tech/webhook/contact-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          timestamp: new Date().toISOString()
+        })
       });
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch {
+
+      if (response.ok) {
+        setSnackbar({
+          open: true,
+          message: 'Thank you for your message. We will get back to you soon!',
+          severity: 'success'
+        });
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
       setSnackbar({
         open: true,
         message: 'Failed to send message. Please try again.',
