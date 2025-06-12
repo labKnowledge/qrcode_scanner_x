@@ -2,10 +2,10 @@
 import React from 'react';
 import { Box, Typography, Chip, Skeleton, Tooltip } from '@mui/material';
 import { QrCodeScanner as QrIcon } from '@mui/icons-material';
-import { useScanStats } from '@/hooks/useScanStats';
+import { useScanStatsContext } from '@/contexts/ScanStatsContext';
 
 const ScanCounter: React.FC = () => {
-  const { stats, isLoading, error } = useScanStats();
+  const { stats, isLoading, error } = useScanStatsContext();
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {

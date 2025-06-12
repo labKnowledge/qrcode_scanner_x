@@ -5,6 +5,7 @@ import { Upload as UploadIcon, OpenInNew as OpenInNewIcon, Share as ShareIcon, R
 import { toast } from 'react-toastify';
 import { useDropzone } from 'react-dropzone';
 import type { DropzoneOptions } from 'react-dropzone';
+import { useScanStatsContext } from '@/contexts/ScanStatsContext';
 
 interface ProcessingResult {
   success: boolean;
@@ -18,6 +19,9 @@ const QRCodeProcessor: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Get stats context for triggering updates
+  const { incrementStats } = useScanStatsContext();
 
   useEffect(() => {
     setIsClient(true);
@@ -112,6 +116,9 @@ const QRCodeProcessor: React.FC = () => {
           content: result.content
         };
         toast.success('QR code processed successfully!');
+        
+        // Trigger stats update immediately after successful scan
+        incrementStats();
       } else {
         processingResult = {
           success: false,
