@@ -19,11 +19,12 @@ export default function RootLayout({
       <head>
       <script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7915052561240587"
         crossOrigin="anonymous"
       ></script>
       </head>
       <body>
+      
         <ClientThemeProvider>
           <Navigation>
             {children}

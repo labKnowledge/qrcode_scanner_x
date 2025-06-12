@@ -28,7 +28,7 @@ export default function GoogleAd({ adSlot, adFormat = 'auto', style }: GoogleAdP
     <ins
       className="adsbygoogle"
       style={{ display: 'block', ...style }}
-      data-ad-client="ca-pub-XXXXXXXXXX"
+      data-ad-client="ca-pub-7915052561240587"
       data-ad-slot={adSlot}
       data-ad-format={adFormat}
       data-full-width-responsive="true"
