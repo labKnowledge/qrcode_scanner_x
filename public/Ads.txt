@@ -1,0 +1,5 @@
+# ads.txt file for authorized digital sellers
+# Format: domain.com, publisher-account-id, DIRECT/RESELLER, TAG-ID
+
+# Google AdSense 
+google.com, pub-7915052561240587, DIRECT, f08c47fec0942fa0
