@@ -1,4 +1,4 @@
-declare module 'jsqr' {
+declare module "jsqr" {
   interface QRCode {
     data: string;
     location: {
@@ -14,9 +14,13 @@ declare module 'jsqr' {
     width: number,
     height: number,
     options?: {
-      inversionAttempts?: 'dontInvert' | 'onlyInvert' | 'attemptBoth' | 'invertFirst';
-    }
+      inversionAttempts?:
+        | "dontInvert"
+        | "onlyInvert"
+        | "attemptBoth"
+        | "invertFirst";
+    },
   ): QRCode | null;
 
   export = jsQR;
-} 
+}

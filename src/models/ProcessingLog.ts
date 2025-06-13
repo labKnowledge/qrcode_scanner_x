@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const processingLogSchema = new mongoose.Schema({
   fileName: { type: String, required: true },
@@ -8,7 +8,7 @@ const processingLogSchema = new mongoose.Schema({
   success: { type: Boolean, required: true },
   errorMessage: { type: String },
   qrCodeContent: { type: String },
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
 });
 
 // Create indexes for common queries
@@ -17,4 +17,6 @@ processingLogSchema.index({ success: 1 });
 processingLogSchema.index({ fileType: 1 });
 
 // Explicitly set the collection name to 'processingLog'
-export const ProcessingLogs = mongoose.models.ProcessingLog || mongoose.model('ProcessingLogs', processingLogSchema, 'processingLogs'); 
+export const ProcessingLogs =
+  mongoose.models.ProcessingLog ||
+  mongoose.model("ProcessingLogs", processingLogSchema, "processingLogs");

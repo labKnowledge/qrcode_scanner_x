@@ -1,11 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || '';
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env');
+  throw new Error(
+    "Please define the MONGODB_URI environment variable inside .env",
+  );
 }
-console.log('MONGODB_URI', MONGODB_URI);
+console.log("MONGODB_URI", MONGODB_URI);
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -21,7 +23,10 @@ declare global {
   var mongoose: MongooseCache | undefined;
 }
 
-const cached: MongooseCache = (global as GlobalWithMongoose).mongoose || { conn: null, promise: null };
+const cached: MongooseCache = (global as GlobalWithMongoose).mongoose || {
+  conn: null,
+  promise: null,
+};
 
 if (!(global as GlobalWithMongoose).mongoose) {
   (global as GlobalWithMongoose).mongoose = cached;
@@ -37,16 +42,17 @@ export async function connectToDatabase() {
       bufferCommands: false,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
-      dbName: 'qrpro'
+      dbName: "qrpro",
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts)
+    cached.promise = mongoose
+      .connect(MONGODB_URI, opts)
       .then((mongoose) => {
-        console.log('MongoDB connected successfully to qrpro database');
+        console.log("MongoDB connected successfully to qrpro database");
         return mongoose;
       })
       .catch((error) => {
-        console.error('MongoDB connection error:', error);
+        console.error("MongoDB connection error:", error);
         cached.promise = null;
         throw error;
       });
@@ -56,7 +62,7 @@ export async function connectToDatabase() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    console.error('Failed to connect to MongoDB:', e);
+    console.error("Failed to connect to MongoDB:", e);
     throw e;
   }
 
@@ -68,16 +74,16 @@ export const disconnectDB = async (): Promise<void> => {
     await mongoose.disconnect();
     cached.conn = null;
     cached.promise = null;
-    console.log('MongoDB disconnected successfully');
+    console.log("MongoDB disconnected successfully");
   } catch (error) {
-    console.error('MongoDB disconnection error:', error);
+    console.error("MongoDB disconnection error:", error);
     throw error;
   }
 };
 
 export const getConnection = (): typeof mongoose => {
   if (!cached.conn) {
-    throw new Error('Database not connected. Call connectToDatabase() first.');
+    throw new Error("Database not connected. Call connectToDatabase() first.");
   }
   return cached.conn;
-}; 
+};

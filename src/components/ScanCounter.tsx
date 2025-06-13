@@ -1,17 +1,17 @@
-'use client';
-import React from 'react';
-import { Box, Typography, Chip, Skeleton, Tooltip } from '@mui/material';
-import { QrCodeScanner as QrIcon } from '@mui/icons-material';
-import { useScanStatsContext } from '@/contexts/ScanStatsContext';
+"use client";
+import React from "react";
+import { Box, Typography, Chip, Skeleton, Tooltip } from "@mui/material";
+import { QrCodeScanner as QrIcon } from "@mui/icons-material";
+import { useScanStatsContext } from "@/contexts/ScanStatsContext";
 
 const ScanCounter: React.FC = () => {
   const { stats, isLoading, error } = useScanStatsContext();
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
+      return (num / 1000000).toFixed(1) + "M";
     } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
+      return (num / 1000).toFixed(1) + "K";
     }
     return num.toString();
   };
@@ -21,20 +21,41 @@ const ScanCounter: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <QrIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
-        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+    <Box
+      sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <QrIcon sx={{ fontSize: 20, color: "text.secondary" }} />
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontWeight: 500 }}
+        >
           QR Scans:
         </Typography>
       </Box>
-      
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+
+      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
         {isLoading ? (
           <>
-            <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
-            <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
-            <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
+            <Skeleton
+              variant="rectangular"
+              width={60}
+              height={24}
+              sx={{ borderRadius: 1 }}
+            />
+            <Skeleton
+              variant="rectangular"
+              width={60}
+              height={24}
+              sx={{ borderRadius: 1 }}
+            />
+            <Skeleton
+              variant="rectangular"
+              width={60}
+              height={24}
+              sx={{ borderRadius: 1 }}
+            />
           </>
         ) : (
           <>
@@ -44,47 +65,47 @@ const ScanCounter: React.FC = () => {
                 size="small"
                 variant="outlined"
                 sx={{
-                  borderColor: 'primary.main',
-                  color: 'primary.main',
+                  borderColor: "primary.main",
+                  color: "primary.main",
                   fontWeight: 600,
-                  '&:hover': {
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                  }
+                  "&:hover": {
+                    bgcolor: "primary.main",
+                    color: "white",
+                  },
                 }}
               />
             </Tooltip>
-            
+
             <Tooltip title="Scans processed this week" arrow>
               <Chip
                 label={`${formatNumber(stats.thisWeek)} This Week`}
                 size="small"
                 variant="outlined"
                 sx={{
-                  borderColor: 'success.main',
-                  color: 'success.main',
+                  borderColor: "success.main",
+                  color: "success.main",
                   fontWeight: 600,
-                  '&:hover': {
-                    bgcolor: 'success.main',
-                    color: 'white',
-                  }
+                  "&:hover": {
+                    bgcolor: "success.main",
+                    color: "white",
+                  },
                 }}
               />
             </Tooltip>
-            
+
             <Tooltip title="Scans processed today" arrow>
               <Chip
                 label={`${formatNumber(stats.today)} Today`}
                 size="small"
                 variant="outlined"
                 sx={{
-                  borderColor: 'info.main',
-                  color: 'info.main',
+                  borderColor: "info.main",
+                  color: "info.main",
                   fontWeight: 600,
-                  '&:hover': {
-                    bgcolor: 'info.main',
-                    color: 'white',
-                  }
+                  "&:hover": {
+                    bgcolor: "info.main",
+                    color: "white",
+                  },
                 }}
               />
             </Tooltip>
@@ -95,4 +116,4 @@ const ScanCounter: React.FC = () => {
   );
 };
 
-export default ScanCounter; 
+export default ScanCounter;

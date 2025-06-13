@@ -1,6 +1,6 @@
 // src/components/GoogleAd.tsx
-'use client';
-import { useEffect } from 'react';
+"use client";
+import { useEffect } from "react";
 
 // Extend Window interface to include adsbygoogle
 declare global {
@@ -15,19 +15,23 @@ interface GoogleAdProps {
   style?: React.CSSProperties;
 }
 
-export default function GoogleAd({ adSlot, adFormat = 'auto', style }: GoogleAdProps) {
+export default function GoogleAd({
+  adSlot,
+  adFormat = "auto",
+  style,
+}: GoogleAdProps) {
   useEffect(() => {
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (err) {
-      console.error('AdSense error:', err);
+      console.error("AdSense error:", err);
     }
   }, []);
 
   return (
     <ins
       className="adsbygoogle"
-      style={{ display: 'block', ...style }}
+      style={{ display: "block", ...style }}
       data-ad-client="ca-pub-7915052561240587"
       data-ad-slot={adSlot}
       data-ad-format={adFormat}

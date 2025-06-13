@@ -1,29 +1,29 @@
-'use client';
-import React, { useState } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Paper, 
-  TextField, 
-  Button, 
+"use client";
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  TextField,
+  Button,
   Snackbar,
   Alert,
   CircularProgress,
   InputAdornment,
   IconButton,
   Tooltip,
-  Fade
-} from '@mui/material';
-import { 
+  Fade,
+} from "@mui/material";
+import {
   Email as EmailIcon,
   Phone as PhoneIcon,
   LocationOn as LocationIcon,
   Send as SendIcon,
   Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon
-} from '@mui/icons-material';
+  Error as ErrorIcon,
+} from "@mui/icons-material";
 
 interface FormData {
   name: string;
@@ -41,107 +41,114 @@ interface FormErrors {
 
 const Contact = () => {
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error'
+    message: "",
+    severity: "success" as "success" | "error",
   });
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    
+
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     } else if (formData.name.length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+      newErrors.name = "Name must be at least 2 characters";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
+      newErrors.email = "Email is required";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)
+    ) {
+      newErrors.email = "Invalid email address";
     }
 
     if (!formData.subject.trim()) {
-      newErrors.subject = 'Subject is required';
+      newErrors.subject = "Subject is required";
     } else if (formData.subject.length < 5) {
-      newErrors.subject = 'Subject must be at least 5 characters';
+      newErrors.subject = "Subject must be at least 5 characters";
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
+      newErrors.message = "Message is required";
     } else if (formData.message.length < 10) {
-      newErrors.message = 'Message must be at least 10 characters';
+      newErrors.message = "Message must be at least 10 characters";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Send form data to webhook
-      const response = await fetch('https://model.takenolab.tech/webhook/contact-form', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        "https://model.takenolab.tech/webhook/contact-form",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            timestamp: new Date().toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-          timestamp: new Date().toISOString()
-        })
-      });
+      );
 
       if (response.ok) {
         setSnackbar({
           open: true,
-          message: 'Thank you for your message. We will get back to you soon!',
-          severity: 'success'
+          message: "Thank you for your message. We will get back to you soon!",
+          severity: "success",
         });
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error("Failed to send message:", error);
       setSnackbar({
         open: true,
-        message: 'Failed to send message. Please try again.',
-        severity: 'error'
+        message: "Failed to send message. Please try again.",
+        severity: "error",
       });
     } finally {
       setIsSubmitting(false);
@@ -149,62 +156,74 @@ const Contact = () => {
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper elevation={0} sx={{ p: { xs: 3, md: 6 }, borderRadius: 2 }}>
-        <Typography variant="h3" component="h1" gutterBottom sx={{ 
-          fontWeight: 700,
-          mb: 4,
-          background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          color: 'transparent'
-        }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          sx={{
+            fontWeight: 700,
+            mb: 4,
+            background: "linear-gradient(45deg, #2563eb, #7c3aed)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
+          }}
+        >
           Contact Us
         </Typography>
 
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 6 }}>
-          <Box sx={{ flex: { md: '0 0 33.333%' } }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 6,
+          }}
+        >
+          <Box sx={{ flex: { md: "0 0 33.333%" } }}>
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ fontWeight: 600, mb: 3 }}
+              >
                 Get in Touch
               </Typography>
-              
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <EmailIcon sx={{ color: 'primary.main', mr: 2 }} />
+
+              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                <EmailIcon sx={{ color: "primary.main", mr: 2 }} />
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Email
                   </Typography>
-                  <Typography variant="body1">
-                    support@scancode.pro
-                  </Typography>
+                  <Typography variant="body1">support@scancode.pro</Typography>
                 </Box>
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <PhoneIcon sx={{ color: 'primary.main', mr: 2 }} />
+              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                <PhoneIcon sx={{ color: "primary.main", mr: 2 }} />
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Phone
                   </Typography>
-                  <Typography variant="body1">
-                    +1 (682) 382-7958
-                  </Typography>
+                  <Typography variant="body1">+1 (682) 382-7958</Typography>
                 </Box>
               </Box>
 
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <LocationIcon sx={{ color: 'primary.main', mr: 2 }} />
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <LocationIcon sx={{ color: "primary.main", mr: 2 }} />
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     Office
                   </Typography>
                   <Typography variant="body1">
-                    Main Street, ID<br />
+                    Main Street, ID
+                    <br />
                     United States
                   </Typography>
                 </Box>
@@ -212,36 +231,71 @@ const Contact = () => {
             </Box>
 
             <Box>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ fontWeight: 600, mb: 3 }}
+              >
                 Business Hours
               </Typography>
-              <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
+              <Box
+                component="table"
+                sx={{ width: "100%", borderCollapse: "collapse" }}
+              >
                 <Box component="tbody">
-                  <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Box component="td" sx={{ py: 1, pr: 2, fontWeight: 500 }}>Monday - Friday</Box>
-                    <Box component="td" sx={{ py: 1 }}>9:00 AM - 6:00 PM</Box>
+                  <Box
+                    component="tr"
+                    sx={{ borderBottom: "1px solid", borderColor: "divider" }}
+                  >
+                    <Box component="td" sx={{ py: 1, pr: 2, fontWeight: 500 }}>
+                      Monday - Friday
+                    </Box>
+                    <Box component="td" sx={{ py: 1 }}>
+                      9:00 AM - 6:00 PM
+                    </Box>
                   </Box>
-                  <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-                    <Box component="td" sx={{ py: 1, pr: 2, fontWeight: 500 }}>Saturday</Box>
-                    <Box component="td" sx={{ py: 1 }}>10:00 AM - 4:00 PM</Box>
+                  <Box
+                    component="tr"
+                    sx={{ borderBottom: "1px solid", borderColor: "divider" }}
+                  >
+                    <Box component="td" sx={{ py: 1, pr: 2, fontWeight: 500 }}>
+                      Saturday
+                    </Box>
+                    <Box component="td" sx={{ py: 1 }}>
+                      10:00 AM - 4:00 PM
+                    </Box>
                   </Box>
                   <Box component="tr">
-                    <Box component="td" sx={{ py: 1, pr: 2, fontWeight: 500 }}>Sunday</Box>
-                    <Box component="td" sx={{ py: 1 }}>Closed</Box>
+                    <Box component="td" sx={{ py: 1, pr: 2, fontWeight: 500 }}>
+                      Sunday
+                    </Box>
+                    <Box component="td" sx={{ py: 1 }}>
+                      Closed
+                    </Box>
                   </Box>
                 </Box>
               </Box>
             </Box>
           </Box>
 
-          <Box sx={{ flex: { md: '0 0 66.666%' } }}>
+          <Box sx={{ flex: { md: "0 0 66.666%" } }}>
             <Box component="form" onSubmit={handleSubmit}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ fontWeight: 600, mb: 3 }}
+              >
                 Send us a Message
               </Typography>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: 3,
+                  }}
+                >
                   <Box sx={{ flex: 1 }}>
                     <TextField
                       fullWidth
@@ -258,7 +312,7 @@ const Contact = () => {
                           <InputAdornment position="end">
                             <CheckCircleIcon color="success" />
                           </InputAdornment>
-                        )
+                        ),
                       }}
                     />
                   </Box>
@@ -279,7 +333,7 @@ const Contact = () => {
                           <InputAdornment position="end">
                             <CheckCircleIcon color="success" />
                           </InputAdornment>
-                        )
+                        ),
                       }}
                     />
                   </Box>
@@ -301,7 +355,7 @@ const Contact = () => {
                         <InputAdornment position="end">
                           <CheckCircleIcon color="success" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Box>
@@ -324,29 +378,36 @@ const Contact = () => {
                         <InputAdornment position="end">
                           <CheckCircleIcon color="success" />
                         </InputAdornment>
-                      )
+                      ),
                     }}
                   />
                 </Box>
 
                 <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Button
                       type="submit"
                       variant="contained"
                       size="large"
-                      startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+                      startIcon={
+                        isSubmitting ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <SendIcon />
+                        )
+                      }
                       disabled={isSubmitting}
                       sx={{
                         py: 1.5,
                         px: 4,
-                        background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
-                        '&:hover': {
-                          background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
-                        }
+                        background: "linear-gradient(45deg, #2563eb, #7c3aed)",
+                        "&:hover": {
+                          background:
+                            "linear-gradient(45deg, #1e40af, #5b21b6)",
+                        },
                       }}
                     >
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {isSubmitting ? "Sending..." : "Send Message"}
                     </Button>
                     <Tooltip title="We typically respond within 24 hours" arrow>
                       <IconButton size="small">
@@ -365,14 +426,20 @@ const Contact = () => {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         TransitionComponent={Fade}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: '100%' }}
-          icon={snackbar.severity === 'success' ? <CheckCircleIcon /> : <ErrorIcon />}
+          sx={{ width: "100%" }}
+          icon={
+            snackbar.severity === "success" ? (
+              <CheckCircleIcon />
+            ) : (
+              <ErrorIcon />
+            )
+          }
         >
           {snackbar.message}
         </Alert>
@@ -381,4 +448,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

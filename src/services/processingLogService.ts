@@ -1,6 +1,6 @@
-import { ProcessingLogs } from '../models/ProcessingLog';
-import { connectToDatabase, getConnection } from '../utils/database';
-import mongoose from 'mongoose';
+import { ProcessingLogs } from "../models/ProcessingLog";
+import { connectToDatabase, getConnection } from "../utils/database";
+import mongoose from "mongoose";
 
 // Define the interface locally since it's not exported from the model
 export interface IProcessingLog extends mongoose.Document {
@@ -31,7 +31,7 @@ export class ProcessingLogService {
       const connection = await connectToDatabase();
       return connection;
     } catch (error) {
-      console.error('Database connection error:', error);
+      console.error("Database connection error:", error);
       throw error;
     }
   }
@@ -51,12 +51,12 @@ export class ProcessingLogService {
       getChanges: () => ({}),
       increment: () => mockDoc,
       modifiedPaths: () => [],
-      modelName: 'ProcessingLog',
-      collection: { name: 'processinglogs' },
+      modelName: "ProcessingLog",
+      collection: { name: "processinglogs" },
       db: getConnection(),
       save: async () => mockDoc,
       toJSON: () => ({ ...logData, _id: mockId, timestamp: new Date() }),
-      toObject: () => ({ ...logData, _id: mockId, timestamp: new Date() })
+      toObject: () => ({ ...logData, _id: mockId, timestamp: new Date() }),
     } as unknown as IProcessingLog;
 
     return mockDoc;
@@ -68,13 +68,17 @@ export class ProcessingLogService {
       const log = new ProcessingLogs(logData);
       return await log.save();
     } catch (error) {
-      console.error('Error creating processing log:', error);
+      console.error("Error creating processing log:", error);
       // Return a mock log if database operation fails
       return this.createMockLog(logData);
     }
   }
 
-  static async getLogsByUserId(userId: string, limit: number = 10, skip: number = 0): Promise<IProcessingLog[]> {
+  static async getLogsByUserId(
+    userId: string,
+    limit: number = 10,
+    skip: number = 0,
+  ): Promise<IProcessingLog[]> {
     try {
       await this.ensureConnection();
       return await ProcessingLogs.find({ userId })
@@ -82,7 +86,7 @@ export class ProcessingLogService {
         .skip(skip)
         .limit(limit);
     } catch (error) {
-      console.error('Error fetching user logs:', error);
+      console.error("Error fetching user logs:", error);
       return [];
     }
   }
@@ -90,11 +94,9 @@ export class ProcessingLogService {
   static async getRecentLogs(limit: number = 10): Promise<IProcessingLog[]> {
     try {
       await this.ensureConnection();
-      return await ProcessingLogs.find()
-        .sort({ timestamp: -1 })
-        .limit(limit);
+      return await ProcessingLogs.find().sort({ timestamp: -1 }).limit(limit);
     } catch (error) {
-      console.error('Error fetching recent logs:', error);
+      console.error("Error fetching recent logs:", error);
       return [];
     }
   }
@@ -106,31 +108,33 @@ export class ProcessingLogService {
   }> {
     try {
       await this.ensureConnection();
-      const [totalProcessed, successfulProcessed, avgProcessingTime] = await Promise.all([
-        ProcessingLogs.countDocuments(),
-        ProcessingLogs.countDocuments({ success: true }),
-        ProcessingLogs.aggregate([
-          {
-            $group: {
-              _id: null,
-              avgTime: { $avg: '$processingTime' }
-            }
-          }
-        ])
-      ]);
+      const [totalProcessed, successfulProcessed, avgProcessingTime] =
+        await Promise.all([
+          ProcessingLogs.countDocuments(),
+          ProcessingLogs.countDocuments({ success: true }),
+          ProcessingLogs.aggregate([
+            {
+              $group: {
+                _id: null,
+                avgTime: { $avg: "$processingTime" },
+              },
+            },
+          ]),
+        ]);
 
       return {
         totalProcessed,
-        successRate: totalProcessed > 0 ? (successfulProcessed / totalProcessed) * 100 : 0,
-        averageProcessingTime: avgProcessingTime[0]?.avgTime || 0
+        successRate:
+          totalProcessed > 0 ? (successfulProcessed / totalProcessed) * 100 : 0,
+        averageProcessingTime: avgProcessingTime[0]?.avgTime || 0,
       };
     } catch (error) {
-      console.error('Error fetching processing stats:', error);
+      console.error("Error fetching processing stats:", error);
       return {
         totalProcessed: 0,
         successRate: 0,
-        averageProcessingTime: 0
+        averageProcessingTime: 0,
       };
     }
   }
-} 
+}

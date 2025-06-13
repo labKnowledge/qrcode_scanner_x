@@ -1,11 +1,26 @@
 "use client";
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { Box, Typography, Button, CircularProgress, Alert, Paper, Fade, Zoom } from '@mui/material';
-import { Upload as UploadIcon, OpenInNew as OpenInNewIcon, Share as ShareIcon, Refresh as RefreshIcon, ContentCopy as ContentCopyIcon } from '@mui/icons-material';
-import { toast } from 'react-toastify';
-import { useDropzone } from 'react-dropzone';
-import type { DropzoneOptions } from 'react-dropzone';
-import { useScanStatsContext } from '@/contexts/ScanStatsContext';
+import { useState, useCallback, useRef, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Alert,
+  Paper,
+  Fade,
+  Zoom,
+} from "@mui/material";
+import {
+  Upload as UploadIcon,
+  OpenInNew as OpenInNewIcon,
+  Share as ShareIcon,
+  Refresh as RefreshIcon,
+  ContentCopy as ContentCopyIcon,
+} from "@mui/icons-material";
+import { toast } from "react-toastify";
+import { useDropzone } from "react-dropzone";
+import type { DropzoneOptions } from "react-dropzone";
+import { useScanStatsContext } from "@/contexts/ScanStatsContext";
 
 interface ProcessingResult {
   success: boolean;
@@ -31,80 +46,89 @@ const QRCodeProcessor: React.FC = () => {
   const copyToClipboard = async (text: string): Promise<void> => {
     try {
       // Check if we're in a browser environment
-      if (typeof window === 'undefined') {
-        console.warn('Clipboard not available: Not in browser environment');
-        toast.error('Clipboard not available. Please copy manually.');
+      if (typeof window === "undefined") {
+        console.warn("Clipboard not available: Not in browser environment");
+        toast.error("Clipboard not available. Please copy manually.");
         return;
       }
 
       // Modern clipboard API (preferred) - check for both clipboard API and secure context
-      if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+      if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText &&
+        window.isSecureContext
+      ) {
         try {
           await navigator.clipboard.writeText(text);
-          toast.success('Copied to clipboard!');
+          toast.success("Copied to clipboard!");
           return;
         } catch (clipboardError) {
-          console.warn('Modern clipboard API failed, trying fallback:', clipboardError);
+          console.warn(
+            "Modern clipboard API failed, trying fallback:",
+            clipboardError,
+          );
           // Fall through to legacy method
         }
       }
 
       // Fallback for older browsers or non-secure contexts
       try {
-        const textArea = document.createElement('textarea');
+        const textArea = document.createElement("textarea");
         textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        textArea.style.opacity = '0';
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        textArea.style.opacity = "0";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
-        const successful = document.execCommand('copy');
+
+        const successful = document.execCommand("copy");
         document.body.removeChild(textArea);
-        
+
         if (successful) {
-          toast.success('Copied to clipboard!');
+          toast.success("Copied to clipboard!");
           return;
         } else {
-          throw new Error('Legacy copy command failed');
+          throw new Error("Legacy copy command failed");
         }
       } catch (legacyError) {
-        console.warn('Legacy clipboard method failed:', legacyError);
-        throw new Error('All clipboard methods failed');
+        console.warn("Legacy clipboard method failed:", legacyError);
+        throw new Error("All clipboard methods failed");
       }
     } catch (error) {
-      console.warn('Copy to clipboard not supported or failed:', error);
-      toast.error('Copy to clipboard not supported. Please copy the text manually.');
+      console.warn("Copy to clipboard not supported or failed:", error);
+      toast.error(
+        "Copy to clipboard not supported. Please copy the text manually.",
+      );
     }
   };
 
   const processImage = async (file: File): Promise<ProcessingResult> => {
     let processingResult: ProcessingResult = {
       success: false,
-      error: 'Processing failed'
+      error: "Processing failed",
     };
 
     try {
       // Create FormData to send the image to the server
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append("image", file);
 
       // Send to secure server-side API
-      const response = await fetch('/api/process-qr', {
-        method: 'POST',
+      const response = await fetch("/api/process-qr", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new Error('Rate limit exceeded. Please try again later.');
+          throw new Error("Rate limit exceeded. Please try again later.");
         } else if (response.status === 400) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Invalid request');
+          throw new Error(errorData.error || "Invalid request");
         } else {
-          throw new Error('Server error. Please try again.');
+          throw new Error("Server error. Please try again.");
         }
       }
 
@@ -113,23 +137,23 @@ const QRCodeProcessor: React.FC = () => {
       if (result.success) {
         processingResult = {
           success: true,
-          content: result.content
+          content: result.content,
         };
-        toast.success('QR code processed successfully!');
-        
+        toast.success("QR code processed successfully!");
+
         // Trigger stats update immediately after successful scan
         incrementStats();
       } else {
         processingResult = {
           success: false,
-          error: result.error || 'No QR code found in the image'
+          error: result.error || "No QR code found in the image",
         };
         toast.error(processingResult.error);
       }
     } catch (err) {
       processingResult = {
         success: false,
-        error: err instanceof Error ? err.message : 'Failed to process image'
+        error: err instanceof Error ? err.message : "Failed to process image",
       };
       toast.error(processingResult.error);
     }
@@ -149,7 +173,10 @@ const QRCodeProcessor: React.FC = () => {
       const result = await processImage(file);
       setResult(result);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred while processing the image';
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An error occurred while processing the image";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -160,45 +187,53 @@ const QRCodeProcessor: React.FC = () => {
   const dropzoneOptions: DropzoneOptions = {
     onDrop,
     accept: {
-      'image/png': ['.png'],
-      'image/jpeg': ['.jpg', '.jpeg'],
-      'image/gif': ['.gif'],
-      'image/webp': ['.webp']
+      "image/png": [".png"],
+      "image/jpeg": [".jpg", ".jpeg"],
+      "image/gif": [".gif"],
+      "image/webp": [".webp"],
     },
     maxFiles: 1,
     multiple: false,
     maxSize: 10 * 1024 * 1024, // 10MB limit
     onDropRejected: (rejectedFiles) => {
       const rejection = rejectedFiles[0]?.errors[0];
-      if (rejection?.code === 'file-too-large') {
-        toast.error('File is too large. Please select a file smaller than 10MB.');
-      } else if (rejection?.code === 'file-invalid-type') {
-        toast.error('Invalid file type. Please select an image file.');
+      if (rejection?.code === "file-too-large") {
+        toast.error(
+          "File is too large. Please select a file smaller than 10MB.",
+        );
+      } else if (rejection?.code === "file-invalid-type") {
+        toast.error("Invalid file type. Please select an image file.");
       } else {
-        toast.error('File rejected. Please try another image.');
+        toast.error("File rejected. Please try another image.");
       }
-    }
+    },
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneOptions);
+  const { getRootProps, getInputProps, isDragActive } =
+    useDropzone(dropzoneOptions);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please upload an image file');
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please upload an image file");
         return;
       }
-      
+
       setIsProcessing(true);
       setError(null);
       setResult(null);
-      
+
       try {
         const result = await processImage(file);
         setResult(result);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred while processing the image';
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : "An error occurred while processing the image";
         setError(errorMessage);
       } finally {
         setIsProcessing(false);
@@ -217,7 +252,7 @@ const QRCodeProcessor: React.FC = () => {
 
   const handleOpenUrl = () => {
     if (result?.success && result.content && isValidUrl(result.content)) {
-      window.open(result.content, '_blank', 'noopener,noreferrer');
+      window.open(result.content, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -225,9 +260,9 @@ const QRCodeProcessor: React.FC = () => {
     if (result?.success && result.content) {
       try {
         // Check if Web Share API is supported
-        if (navigator.share && typeof navigator.share === 'function') {
+        if (navigator.share && typeof navigator.share === "function") {
           await navigator.share({
-            title: 'QR Code Content',
+            title: "QR Code Content",
             text: result.content,
           });
         } else {
@@ -235,7 +270,7 @@ const QRCodeProcessor: React.FC = () => {
           await copyToClipboard(result.content);
         }
       } catch (err) {
-        console.error('Error sharing:', err);
+        console.error("Error sharing:", err);
         // Fallback to clipboard if sharing fails
         await copyToClipboard(result.content);
       }
@@ -252,22 +287,22 @@ const QRCodeProcessor: React.FC = () => {
     setResult(null);
     setError(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   // Prevent hydration mismatch by not rendering on server
   if (!isClient) {
     return (
-      <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto', p: 3 }}>
+      <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", p: 3 }}>
         <Box
           sx={{
-            border: '2px dashed',
-            borderColor: 'grey.300',
+            border: "2px dashed",
+            borderColor: "grey.300",
             borderRadius: 2,
             p: 4,
-            textAlign: 'center',
-            bgcolor: 'background.paper',
+            textAlign: "center",
+            bgcolor: "background.paper",
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -279,35 +314,44 @@ const QRCodeProcessor: React.FC = () => {
   }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto', p: 3 }}>
+    <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", p: 3 }}>
       <Box
         {...getRootProps()}
         sx={{
-          border: '2px dashed',
-          borderColor: isDragActive ? 'primary.main' : 'grey.300',
+          border: "2px dashed",
+          borderColor: isDragActive ? "primary.main" : "grey.300",
           borderRadius: 2,
           p: 4,
-          textAlign: 'center',
-          cursor: 'pointer',
-          bgcolor: isDragActive ? 'action.hover' : 'background.paper',
-          transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            borderColor: 'primary.main',
-            bgcolor: 'action.hover'
-          }
+          textAlign: "center",
+          cursor: "pointer",
+          bgcolor: isDragActive ? "action.hover" : "background.paper",
+          transition: "all 0.2s ease-in-out",
+          "&:hover": {
+            borderColor: "primary.main",
+            bgcolor: "action.hover",
+          },
         }}
       >
         <input {...getInputProps()} />
         {isProcessing ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
             <CircularProgress />
             <Typography>Processing image...</Typography>
           </Box>
         ) : (
           <Box>
-            <UploadIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+            <UploadIcon sx={{ fontSize: 48, color: "text.secondary", mb: 2 }} />
             <Typography variant="h6" gutterBottom>
-              {isDragActive ? 'Drop the image here' : 'Drag & drop an image here, or click to select'}
+              {isDragActive
+                ? "Drop the image here"
+                : "Drag & drop an image here, or click to select"}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Supports PNG, JPG, JPEG, GIF, and WebP (max 10MB)
@@ -319,7 +363,7 @@ const QRCodeProcessor: React.FC = () => {
       {error && (
         <Fade in={true}>
           <Box sx={{ mt: 2 }}>
-            <Alert severity="error" sx={{ width: '100%' }} variant="filled">
+            <Alert severity="error" sx={{ width: "100%" }} variant="filled">
               {error}
             </Alert>
           </Box>
@@ -329,11 +373,13 @@ const QRCodeProcessor: React.FC = () => {
       {result && (
         <Fade in={true}>
           <Box sx={{ mt: 2 }}>
-            <Alert severity={result.success ? 'success' : 'error'} sx={{ width: '100%' }} variant="filled">
+            <Alert
+              severity={result.success ? "success" : "error"}
+              sx={{ width: "100%" }}
+              variant="filled"
+            >
               {result.success ? (
-                <Typography>
-                  QR Code processed successfully!
-                </Typography>
+                <Typography>QR Code processed successfully!</Typography>
               ) : (
                 <Typography>{result.error}</Typography>
               )}
@@ -347,11 +393,11 @@ const QRCodeProcessor: React.FC = () => {
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/png,image/jpeg,image/gif,image/webp"
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         aria-label="Upload QR code image"
       />
 
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+      <Box sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}>
         {!result && !isProcessing && (
           <Fade in={true}>
             <Box>
@@ -360,10 +406,10 @@ const QRCodeProcessor: React.FC = () => {
                 startIcon={<UploadIcon />}
                 onClick={() => fileInputRef.current?.click()}
                 sx={{
-                  background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
-                  }
+                  background: "linear-gradient(45deg, #2563eb, #7c3aed)",
+                  "&:hover": {
+                    background: "linear-gradient(45deg, #1e40af, #5b21b6)",
+                  },
                 }}
               >
                 Select Image
@@ -379,9 +425,9 @@ const QRCodeProcessor: React.FC = () => {
                 elevation={3}
                 sx={{
                   p: 3,
-                  textAlign: 'center',
-                  bgcolor: 'background.paper',
-                  borderRadius: 2
+                  textAlign: "center",
+                  bgcolor: "background.paper",
+                  borderRadius: 2,
                 }}
               >
                 <Typography variant="h6" gutterBottom>
@@ -390,27 +436,34 @@ const QRCodeProcessor: React.FC = () => {
                 <Typography
                   variant="body1"
                   sx={{
-                    wordBreak: 'break-all',
-                    fontFamily: 'monospace',
-                    bgcolor: 'grey.100',
+                    wordBreak: "break-all",
+                    fontFamily: "monospace",
+                    bgcolor: "grey.100",
                     p: 2,
                     borderRadius: 1,
-                    mb: 2
+                    mb: 2,
                   }}
                 >
                   {result.content}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Button
                     variant="contained"
                     size="small"
                     startIcon={<ContentCopyIcon />}
                     onClick={handleCopy}
                     sx={{
-                      background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
-                      }
+                      background: "linear-gradient(45deg, #2563eb, #7c3aed)",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #1e40af, #5b21b6)",
+                      },
                     }}
                   >
                     Copy
@@ -422,10 +475,11 @@ const QRCodeProcessor: React.FC = () => {
                       startIcon={<OpenInNewIcon />}
                       onClick={handleOpenUrl}
                       sx={{
-                        background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
-                        '&:hover': {
-                          background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
-                        }
+                        background: "linear-gradient(45deg, #2563eb, #7c3aed)",
+                        "&:hover": {
+                          background:
+                            "linear-gradient(45deg, #1e40af, #5b21b6)",
+                        },
                       }}
                     >
                       Open URL
@@ -437,10 +491,10 @@ const QRCodeProcessor: React.FC = () => {
                     startIcon={<ShareIcon />}
                     onClick={handleShare}
                     sx={{
-                      background: 'linear-gradient(45deg, #2563eb, #7c3aed)',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #1e40af, #5b21b6)',
-                      }
+                      background: "linear-gradient(45deg, #2563eb, #7c3aed)",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #1e40af, #5b21b6)",
+                      },
                     }}
                   >
                     Share
@@ -451,12 +505,12 @@ const QRCodeProcessor: React.FC = () => {
                     startIcon={<RefreshIcon />}
                     onClick={resetProcessor}
                     sx={{
-                      borderColor: 'primary.main',
-                      color: 'primary.main',
-                      '&:hover': {
-                        borderColor: 'primary.dark',
-                        bgcolor: 'action.hover'
-                      }
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                      "&:hover": {
+                        borderColor: "primary.dark",
+                        bgcolor: "action.hover",
+                      },
                     }}
                   >
                     Process Another
